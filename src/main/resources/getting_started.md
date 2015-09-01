@@ -32,11 +32,11 @@ All database queries must take place within a *session*. Sessions will be explai
 ##Import
 You'll notice we imported `ExampleDatastore._` in an effort to minimise the amount of code required here. We can explicitly write it more verbosely like this:
 
-[scala type="section" section="create-verbose"]
+[scala type="section" section="createVerbose"]
 
 For the sake of readability importing the datastore is generally suggested. Although if namespace collisions are a problem you can import and alias or create a shorter reference like this:
 
-[scala type="section" section="create-aliased"]
+[scala type="section" section="createAliased"]
 
 #Inserting
 ScalaRelational supports type-safe insertions:
@@ -47,19 +47,19 @@ If we don't call `result`, we will just create the query without ever executing 
 
 There is also a shorthand when using values in order:
 
-[scala type="section" section="insert-shorthand"]
+[scala type="section" section="insertShorthand"]
 
 The database returns -1 as the ID is already known.
 
 If you want to insert multiple rows at the same time, you can use a batch insertion:
 
-[scala type="section" section="insert-batch"]
+[scala type="section" section="insertBatch"]
 
 This is very similar to the previous insert method, except instead of calling `result` we're calling `and`. This converts the insert into a batch insert and you gain the performance of being able to insert several records with one insert statement.
 
 You can also pass a `Seq` to `insertBatch`, which is useful if the rows are loaded from a file for example:
 
-[scala type="section" section="insert-sequence"]
+[scala type="section" section="insertSequence"]
     
 #Querying
 The DSL for querying a table is similar to SQL:
@@ -68,7 +68,7 @@ The DSL for querying a table is similar to SQL:
 
 Although that could look a little prettier by explicitly querying what we want to see:
 
-[scala type="section" section="query-converted"]
+[scala type="section" section="queryConverted"]
 
 Joins are supported too. In the following example we query all coffees back filtering and joining with suppliers:
 

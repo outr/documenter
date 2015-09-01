@@ -31,7 +31,8 @@ class Documenter(outputDirectory: File) {
     }
     val result = BlockRegex.replaceAllIn(enhancedMarkdown, (m: Regex.Match) => {
       val block = Documenter.block(m.group(1))
-      block.replace(m)
+      val replacement = block.replace(m)
+      Regex.quoteReplacement(replacement)
     })
     Files.write(new File(outputDirectory, s"$name.md").toPath, result.getBytes)
   }
@@ -56,7 +57,7 @@ object Documenter {
 trait BlockSupport {
   def name: String
 
-  final def replace(m: Regex.Match): String = {
+  final def replace(m: Regex.Match): String = try {
     var map = Map.empty[String, String]
     var key: String = null
     var open = false
@@ -76,6 +77,11 @@ trait BlockSupport {
       case c => b.append(c)
     }
     convert(map)
+  } catch {
+    case t: Throwable => {
+      new RuntimeException(s"Failed to replace ${m.group(0)} for block $name.", t).printStackTrace()
+      throw t
+    }
   }
 
   def convert(args: Map[String, String]): String
@@ -180,7 +186,20 @@ object ScalaBlock extends BlockSupport {
   }
 
   def section(name: String) = {
-    s"SECTION: $name"
+    var spacing = ""
+    val lines = forBlock(
+      isStart = (s: String) => {
+        val b = s.trim.startsWith(s"""section("$name"""")
+        if (b) {
+          spacing = s.substring(0, s.indexOf('s'))
+        }
+        b
+      },
+      isEnd = (s: String) => s == s"$spacing}",
+      includeStart = false,
+      includeEnd = false
+    )
+    scalaBlock(lines)
   }
 }
 

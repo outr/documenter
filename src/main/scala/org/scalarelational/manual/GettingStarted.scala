@@ -12,7 +12,7 @@ object GettingStarted {
     }
   }
   
-  section("create-verbose", invoke = false) {
+  section("createVerbose", invoke = false) {
     GettingStartedDatastore.session {
       GettingStartedDatastore.create(
         GettingStartedDatastore.suppliers,
@@ -21,7 +21,7 @@ object GettingStarted {
     }
   }
 
-  section("create-aliased", invoke = false) {
+  section("createAliased", invoke = false) {
     def ds = GettingStartedDatastore
 
     ds.session {
@@ -41,7 +41,7 @@ object GettingStarted {
     }
   }
 
-  section("insert-shorthand") {
+  section("insertShorthand") {
     import GettingStartedDatastore._
 
     session {
@@ -49,7 +49,7 @@ object GettingStarted {
     }
   }
 
-  section("insert-batch") {
+  section("insertBatch") {
     import GettingStartedDatastore._
     import coffees._
 
@@ -62,7 +62,7 @@ object GettingStarted {
     }
   }
 
-  section("insert-sequence") {
+  section("insertSequence") {
     import GettingStartedDatastore._
     import coffees._
 
@@ -87,7 +87,7 @@ object GettingStarted {
     }
   }
 
-  section("query-converted") {
+  section("queryConverted") {
     import GettingStartedDatastore._
     import GettingStartedDatastore.{coffees => c}
 
