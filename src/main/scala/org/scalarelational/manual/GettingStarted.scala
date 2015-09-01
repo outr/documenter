@@ -1,7 +1,5 @@
 package org.scalarelational.manual
 
-import org.scalarelational.manual
-
 /**
  * @author Matt Hicks <matt@outr.com>
  */
