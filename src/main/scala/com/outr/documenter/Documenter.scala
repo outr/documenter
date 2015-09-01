@@ -1,5 +1,9 @@
 package com.outr.documenter
 
+import java.io.File
+import java.nio.file.Files
+
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.util.matching.Regex
 
@@ -7,13 +11,15 @@ import scala.util.matching.Regex
  * @author Matt Hicks <matt@outr.com>
  */
 object Test extends App {
-  val documenter = new Documenter
+  val documenter = new Documenter(new File("generated"))
   documenter.add("getting_started")
 }
 
-class Documenter {
+class Documenter(outputDirectory: File) {
   private def Blocks = Documenter.blocks.map(_.name).mkString("|")
   private def BlockRegex = s"""\\[($Blocks) (.+?)\\]""".r
+
+  outputDirectory.mkdirs()
 
   def add(name: String) = {
     val resource = getClass.getClassLoader.getResource(s"$name.md")
@@ -27,7 +33,7 @@ class Documenter {
       val block = Documenter.block(m.group(1))
       block.replace(m)
     })
-//    println(result)
+    Files.write(new File(outputDirectory, s"$name.md").toPath, result.getBytes)
   }
 }
 
@@ -99,6 +105,8 @@ object ScalaBlock extends BlockSupport {
 
   var filename: Option[String] = None
 
+  def file = new File(s"src/main/scala/${PackageBlock.current.getOrElse("").replaceAll("[.]", "/")}/${filename.get}.scala")
+
   def convert(args: Map[String, String]) = {
     args.get("filename") match {
       case Some(fn) => filename = Some(fn)
@@ -111,19 +119,68 @@ object ScalaBlock extends BlockSupport {
       case "section" => section(args("section"))
       case t => throw new RuntimeException(s"Scala block type `$t` unknown.")
     }
-    "SCALA"
   }
 
+  private def forLines(f: String => Unit) = {
+    val source = Source.fromFile(file)
+    try {
+      source.getLines().foreach(f)
+    } finally {
+      source.close()
+    }
+  }
+
+  private def forBlock(isStart: String => Boolean, isEnd: String => Boolean, include: String => Boolean = (s: String) => true, includeStart: Boolean = true, includeEnd: Boolean = true) = {
+    var started = false
+    var ended = false
+    val lines = ListBuffer.empty[String]
+    forLines { line =>
+      if (!ended && !started && isStart(line)) {
+        started = true
+        if (includeStart && include(line)) {
+          lines += line
+        }
+      } else if (!ended && started && isEnd(line)) {
+        ended = true
+        if (includeEnd && include(line)) {
+          lines += line
+        }
+      } else if (started && !ended && include(line)) {
+        lines += line
+      }
+    }
+    lines.toList
+  }
+
+  private def scalaBlock(lines: List[String]) =
+    s"""```scala
+       |${lines.mkString("\n")}
+       |```
+     """.stripMargin
+
   def imports() = {
-    // TODO: handle
+    val imports = forBlock(
+      (s: String) => s.startsWith("import"),
+      (s: String) => s.startsWith("class") || s.startsWith("object"),
+      (s: String) => s.startsWith("import"),
+      includeEnd = false)
+    scalaBlock(imports)
   }
 
   def obj() = {
-    // TODO: handle
+    var spacing = ""
+    val lines = forBlock((s: String) => {
+      val b = s.trim.startsWith(s"object ${filename.get}")
+      if (b) {
+        spacing = s.substring(0, s.indexOf('o'))
+      }
+      b
+    }, (s: String) => s == s"$spacing}")
+    scalaBlock(lines)
   }
 
   def section(name: String) = {
-    // TODO: handle
+    s"SECTION: $name"
   }
 }
 
