@@ -19,7 +19,7 @@ The next thing you need is the database representation in Scala. The schema can 
 
 [scala type="object" filename="GettingStartedDatastore"]
 
-Our `Datastore` contains `Table`s and our `Table`s contain `Column`s. As for the `Datastore` we have chosen an in-memory H2 database. Every column type must have a `DataType` associated with it. You don't see it referenced above because all standard Scala types have predefined implicit conversions available footnote{See the url[https://github.com/outr/scalarelational/blob/master/core/src/main/scala/org/scalarelational/datatype/DataTypeSupport.scala]{`DataTypeSupport`} trait for more information}. If you need to use a type that is not supported by ScalaRelational, please refer to [link name="custom-column-type"].
+Our `Datastore` contains `Table`s and our `Table`s contain `Column`s. As for the `Datastore` we have chosen an in-memory H2 database. Every column type must have a `DataType` associated with it. You don't see it referenced above because all standard Scala types have predefined implicit conversions available [footnote text="See the `DataTypeSupport` trait for more information" url="https://github.com/outr/scalarelational/blob/master/core/src/main/scala/org/scalarelational/datatype/DataTypeSupport.scala"]. If you need to use a type that is not supported by ScalaRelational, please refer to [link name="custom-column-type"].
 
 #Create the database
 Now that we have our schema defined in Scala, we need to create the tables in the database:
