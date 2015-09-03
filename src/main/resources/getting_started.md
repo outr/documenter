@@ -1,4 +1,4 @@
-[package value="org.scalarelational.manual"]
+[package value="org.scalarelational.manual.gettingstarted"]
 This chapter will guide you through creating your first project with ScalaRelational. For the sake of simplicity we will use an in-memory H2 database.
 
 #sbt dependencies

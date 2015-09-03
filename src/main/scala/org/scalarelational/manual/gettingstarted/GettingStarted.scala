@@ -1,9 +1,12 @@
-package org.scalarelational.manual
+package org.scalarelational.manual.gettingstarted
+
+import GettingStartedDatastore
+import GettingStartedDatastore._
 
 /**
  * @author Matt Hicks <matt@outr.com>
  */
-object GettingStarted {
+object GettingStarted extends SectionSupport {
   section("create") {
     import GettingStartedDatastore._
 
@@ -88,8 +91,7 @@ object GettingStarted {
   }
 
   section("queryConverted") {
-    import GettingStartedDatastore._
-    import GettingStartedDatastore.{coffees => c}
+    import GettingStartedDatastore.{coffees => c, _}
 
     session {
       val query = select (c.name, c.supID, c.price, c.sales, c.total) from coffees
@@ -113,9 +115,5 @@ object GettingStarted {
         s"Coffee: ${r(coffees.name)}, Supplier: ${r(suppliers.name)}"
       }.mkString("\n")
     }
-  }
-
-  protected def section[R](name: String, invoke: Boolean = true)(f: => R) = {
-    f
   }
 }

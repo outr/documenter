@@ -1,7 +1,7 @@
-package org.scalarelational.manual
+package org.scalarelational.manual.gettingstarted
 
-import org.scalarelational.column.property.{ForeignKey, AutoIncrement, PrimaryKey, Unique}
-import org.scalarelational.h2.{H2Memory, H2Datastore}
+import org.scalarelational.column.property.{AutoIncrement, ForeignKey, PrimaryKey, Unique}
+import org.scalarelational.h2.{H2Datastore, H2Memory}
 import org.scalarelational.table.Table
 
 /**
