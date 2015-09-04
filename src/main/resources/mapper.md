@@ -1,13 +1,13 @@
-[package value="org.scalarelational.manual.mapper]
+[package value="org.scalarelational.manual.mapper"]
 The mapper module provides functionality to map table rows when persisting or selecting rows.
 
 #sbt dependency
 We must first add another dependency to our build file:
 
 ```scala
-  libraryDependencies += "org.scalarelational" %% "scalarelational-mapper" % "1.1.0-SNAPSHOT"
-  
-  libraryDependencies += "org.scalarelational" %% "scalarelational-h2" % "1.1.0-SNAPSHOT"
+libraryDependencies += "org.scalarelational" %% "scalarelational-mapper" % "1.1.0-SNAPSHOT"
+
+libraryDependencies += "org.scalarelational" %% "scalarelational-h2" % "1.1.0-SNAPSHOT"
 ```
 
 #Library imports

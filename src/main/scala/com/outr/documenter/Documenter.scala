@@ -12,7 +12,9 @@ import scala.util.matching.Regex
  */
 object Test extends App {
   val documenter = new Documenter(new File("generated"))
+  documenter.add("introduction")
   documenter.add("getting_started")
+  documenter.add("mapper")
 }
 
 class Documenter(outputDirectory: File) {
@@ -21,7 +23,7 @@ class Documenter(outputDirectory: File) {
 
   outputDirectory.mkdirs()
 
-  def add(name: String) = {
+  def add(name: String) = try {
     val resource = getClass.getClassLoader.getResource(s"$name.md")
     val source = Source.fromURL(resource)
     val enhancedMarkdown = try {
@@ -35,6 +37,8 @@ class Documenter(outputDirectory: File) {
       Regex.quoteReplacement(replacement)
     })
     Files.write(new File(outputDirectory, s"$name.md").toPath, result.getBytes)
+  } catch {
+    case t: Throwable => throw new RuntimeException(s"Failed to process: $name", t)
   }
 }
 
@@ -79,8 +83,7 @@ trait BlockSupport {
     convert(map)
   } catch {
     case t: Throwable => {
-      new RuntimeException(s"Failed to replace ${m.group(0)} for block $name.", t).printStackTrace()
-      throw t
+      throw new RuntimeException(s"Failed to replace ${m.group(0)} for block $name.", t)
     }
   }
 
@@ -121,7 +124,10 @@ object ScalaBlock extends BlockSupport {
     }
     args("type") match {
       case "imports" => imports()
-      case "object" => obj()
+      case "object" => handleObject()
+      case "class" => handleClass()
+      case "case class" => handleCaseClass()
+      case "trait" => handleTrait()
       case "section" => section(args("section"))
       case t => throw new RuntimeException(s"Scala block type `$t` unknown.")
     }
@@ -173,12 +179,48 @@ object ScalaBlock extends BlockSupport {
     scalaBlock(imports)
   }
 
-  def obj() = {
+  def handleObject() = {
     var spacing = ""
     val lines = forBlock((s: String) => {
       val b = s.trim.startsWith(s"object ${filename.get}")
       if (b) {
         spacing = s.substring(0, s.indexOf('o'))
+      }
+      b
+    }, (s: String) => s == s"$spacing}")
+    scalaBlock(lines)
+  }
+
+  def handleClass() = {
+    var spacing = ""
+    val lines = forBlock((s: String) => {
+      val b = s.trim.startsWith(s"class ${filename.get}")
+      if (b) {
+        spacing = s.substring(0, s.indexOf('c'))
+      }
+      b
+    }, (s: String) => s == s"$spacing}")
+    scalaBlock(lines)
+  }
+
+  def handleCaseClass() = {
+    var spacing = ""
+    val lines = forBlock((s: String) => {
+      val b = s.trim.startsWith(s"case class ${filename.get}")
+      if (b) {
+        spacing = s.substring(0, s.indexOf('c'))
+      }
+      b
+    }, (s: String) => s == s"$spacing}")
+    scalaBlock(lines)
+  }
+
+  def handleTrait() = {
+    var spacing = ""
+    val lines = forBlock((s: String) => {
+      val b = s.trim.startsWith(s"trait ${filename.get}")
+      if (b) {
+        spacing = s.substring(0, s.indexOf('t'))
       }
       b
     }, (s: String) => s == s"$spacing}")

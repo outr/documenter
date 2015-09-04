@@ -1,7 +1,6 @@
 package org.scalarelational.manual.gettingstarted
 
-import GettingStartedDatastore
-import GettingStartedDatastore._
+import com.outr.documenter.SectionSupport
 
 /**
  * @author Matt Hicks <matt@outr.com>
@@ -94,7 +93,7 @@ object GettingStarted extends SectionSupport {
     import GettingStartedDatastore.{coffees => c, _}
 
     session {
-      val query = select (c.name, c.supID, c.price, c.sales, c.total) from coffees
+      val query = select (c.name, c.supID, c.price, c.sales, c.total) from c
 
       query.result.converted.map {
         case (name, supID, price, sales, total) => s"$name  $supID  $price  $sales  $total"

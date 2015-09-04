@@ -14,8 +14,8 @@ If you'd prefer to use another database instead, please refer to the chapter LIN
 You will need the following imports:
 
 ```scala
-import org.scalarelational.column.property.{ForeignKey, AutoIncrement, PrimaryKey, Unique}
-import org.scalarelational.h2.{H2Memory, H2Datastore}
+import org.scalarelational.column.property.{AutoIncrement, ForeignKey, PrimaryKey, Unique}
+import org.scalarelational.h2.{H2Datastore, H2Memory}
 import org.scalarelational.table.Table
 ```
      
@@ -170,11 +170,10 @@ The DSL for querying a table is similar to SQL:
 Although that could look a little prettier by explicitly querying what we want to see:
 
 ```scala
-    import GettingStartedDatastore._
-    import GettingStartedDatastore.{coffees => c}
+    import GettingStartedDatastore.{coffees => c, _}
 
     session {
-      val query = select (c.name, c.supID, c.price, c.sales, c.total) from coffees
+      val query = select (c.name, c.supID, c.price, c.sales, c.total) from c
 
       query.result.converted.map {
         case (name, supID, price, sales, total) => s"$name  $supID  $price  $sales  $total"
