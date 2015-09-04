@@ -142,24 +142,34 @@ object ScalaBlock extends BlockSupport {
     }
   }
 
-  private def forBlock(isStart: String => Boolean, isEnd: String => Boolean, include: String => Boolean = (s: String) => true, includeStart: Boolean = true, includeEnd: Boolean = true) = {
+  private def forBlock(isStart: String => Boolean, isEnd: String => Boolean, process: String => Option[String] = (s: String) => Some(s), includeStart: Boolean = true, includeEnd: Boolean = true) = {
     var started = false
     var ended = false
     val lines = ListBuffer.empty[String]
+    def proc(line: String) = process(line) match {
+      case Some(l) => lines += l
+      case None => // Ignore
+    }
+    var lineNumber = 0
     forLines { line =>
-      if (!ended && !started && isStart(line)) {
-        started = true
-        if (includeStart && include(line)) {
-          lines += line
+      try {
+        if (!ended && !started && isStart(line)) {
+          started = true
+          if (includeStart) {
+            proc(line)
+          }
+        } else if (!ended && started && isEnd(line)) {
+          ended = true
+          if (includeEnd) {
+            proc(line)
+          }
+        } else if (started && !ended) {
+          proc(line)
         }
-      } else if (!ended && started && isEnd(line)) {
-        ended = true
-        if (includeEnd && include(line)) {
-          lines += line
-        }
-      } else if (started && !ended && include(line)) {
-        lines += line
+      } catch {
+        case t: Throwable => throw new RuntimeException(s"Unable to process line: [$line] (line number: $lineNumber)", t)
       }
+      lineNumber += 1
     }
     lines.toList
   }
@@ -174,10 +184,12 @@ object ScalaBlock extends BlockSupport {
     val imports = forBlock(
       (s: String) => s.startsWith("import"),
       (s: String) => s.startsWith("class") || s.startsWith("object"),
-      (s: String) => s.startsWith("import"),
+      (s: String) => if (s.startsWith("import")) Some(s) else None,
       includeEnd = false)
     scalaBlock(imports)
   }
+
+  private def trimmingProcessor(length: => Int) = (line: String) => Some(if (line.length > length) line.substring(length) else line)
 
   def handleObject() = {
     var spacing = ""
@@ -187,7 +199,7 @@ object ScalaBlock extends BlockSupport {
         spacing = s.substring(0, s.indexOf('o'))
       }
       b
-    }, (s: String) => s == s"$spacing}")
+    }, (s: String) => s == s"$spacing}", trimmingProcessor(spacing.length))
     scalaBlock(lines)
   }
 
@@ -199,7 +211,7 @@ object ScalaBlock extends BlockSupport {
         spacing = s.substring(0, s.indexOf('c'))
       }
       b
-    }, (s: String) => s == s"$spacing}")
+    }, (s: String) => s == s"$spacing}", trimmingProcessor(spacing.length))
     scalaBlock(lines)
   }
 
@@ -211,7 +223,7 @@ object ScalaBlock extends BlockSupport {
         spacing = s.substring(0, s.indexOf('c'))
       }
       b
-    }, (s: String) => s == s"$spacing}")
+    }, (s: String) => s == s"$spacing}", trimmingProcessor(spacing.length))
     scalaBlock(lines)
   }
 
@@ -223,12 +235,33 @@ object ScalaBlock extends BlockSupport {
         spacing = s.substring(0, s.indexOf('t'))
       }
       b
-    }, (s: String) => s == s"$spacing}")
+    }, (s: String) => s == s"$spacing}", trimmingProcessor(spacing.length))
     scalaBlock(lines)
   }
 
   def section(name: String) = {
     var spacing = ""
+    var length = -1
+    val trimmer = (line: String) => {
+      val s = if (length == -1 && line.trim.startsWith("section")) {
+        line.substring(spacing.length)
+      } else if (length != -1 && line == s"$spacing}") {
+        line.trim
+      } else {
+        if (length == -1) {
+          val Regex = "(\\W*)(.+)".r
+          line match {
+            case Regex(whitespace, other) => length = whitespace.length
+          }
+        }
+        if (line.length > length) {
+          line.substring(length)
+        } else {
+          line
+        }
+      }
+      Some(s)
+    }
     val lines = forBlock(
       isStart = (s: String) => {
         val b = s.trim.startsWith(s"""section("$name"""")
@@ -238,6 +271,7 @@ object ScalaBlock extends BlockSupport {
         b
       },
       isEnd = (s: String) => s == s"$spacing}",
+      trimmer,
       includeStart = false,
       includeEnd = false
     )

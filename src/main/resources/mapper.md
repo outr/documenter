@@ -32,9 +32,9 @@ Along with the table definition, you have to declare an accompanying `case class
 
 A `case class` needs to extend from `Entity`. Furthermore, it needs to define the table that the columns map to.
 
-[scala type="class" filename="Supplier"]
+[scala type="case class" filename="Supplier"]
 
-[scala type="class" filename="Coffee"]
+[scala type="case class" filename="Coffee"]
 
 Though all of these fields are in the same order as the table, this is not required to be the case. Mapping takes place based on the field name to the column name in the table, so order doesn't matter.
 

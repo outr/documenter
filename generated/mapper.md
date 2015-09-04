@@ -57,11 +57,11 @@ You may have noticed that the supplier ID in `coffees` now has a type-safe refer
 As previously, create the tables using `create`:
 
 ```scala
-    import MapperDatastore._
+import MapperDatastore._
 
-    session {
-      create(suppliers, coffees)
-    }
+session {
+  create(suppliers, coffees)
+}
 ```
      
 
@@ -71,12 +71,26 @@ Along with the table definition, you have to declare an accompanying `case class
 A `case class` needs to extend from `Entity`. Furthermore, it needs to define the table that the columns map to.
 
 ```scala
-
+case class Supplier(name: String,
+                    street: String,
+                    city: String,
+                    state: Option[String],
+                    zip: String,
+                    id: Option[Int] = None) extends Entity[Supplier] {
+  def columns = mapTo[Supplier](MapperDatastore.suppliers)
+}
 ```
      
 
 ```scala
-
+case class Coffee(name: String,
+                  supID: Ref[Supplier],
+                  price: Double,
+                  sales: Int,
+                  total: Int,
+                  id: Option[Int] = None) extends Entity[Coffee] {
+  def columns = mapTo[Coffee](MapperDatastore.coffees)
+}
 ```
      
 
@@ -86,11 +100,11 @@ Though all of these fields are in the same order as the table, this is not requi
 We've create a `Supplier` case class, but now we need to create an instance and insert it into the database:
 
 ```scala
-    import MapperDatastore._
-    session {
-      val starbucks = Supplier("Starbucks", "123 Everywhere Rd.", "Lotsaplaces", Some("CA"), "93966")
-      starbucks.insert.result
-    }
+import MapperDatastore._
+session {
+  val starbucks = Supplier("Starbucks", "123 Everywhere Rd.", "Lotsaplaces", Some("CA"), "93966")
+  starbucks.insert.result
+}
 ```
      
 
@@ -110,16 +124,16 @@ object Ids {
 And insert some additional suppliers and capture their ids:
 
 ```scala
-    import MapperDatastore._
-    import Ids._
+import MapperDatastore._
+import Ids._
 
-    transaction {
-      acmeId = Supplier("Acme, Inc.", "99 Market Street", "Groundsville", Some("CA"), "95199").insert.result
-      superiorCoffeeId = Supplier("Superior Coffee", "1 Party Place", "Mendocino", None, "95460").insert.result
-      theHighGroundId = Supplier("The High Ground", "100 Coffee Lane", "Meadows", Some("CA"), "93966").insert.result
+transaction {
+  acmeId = Supplier("Acme, Inc.", "99 Market Street", "Groundsville", Some("CA"), "95199").insert.result
+  superiorCoffeeId = Supplier("Superior Coffee", "1 Party Place", "Mendocino", None, "95460").insert.result
+  theHighGroundId = Supplier("The High Ground", "100 Coffee Lane", "Meadows", Some("CA"), "93966").insert.result
 
-      (acmeId, superiorCoffeeId, theHighGroundId)
-    }
+  (acmeId, superiorCoffeeId, theHighGroundId)
+}
 ```
      
 
@@ -127,16 +141,16 @@ And insert some additional suppliers and capture their ids:
 Now that we have some suppliers, we need to add some coffees as well:
 
 ```scala
-    import MapperDatastore._
-    import Ids._
+import MapperDatastore._
+import Ids._
 
-    session {
-      Coffee("Colombian", acmeId, 7.99, 0, 0).insert.
-        and(Coffee("French Roast", superiorCoffeeId, 8.99, 0, 0).insert).
-        and(Coffee("Espresso", theHighGroundId, 9.99, 0, 0).insert).
-        and(Coffee("Colombian Decaf", acmeId, 8.99, 0, 0).insert).
-        and(Coffee("French Roast Decaf", superiorCoffeeId, 9.99, 0, 0).insert).result
-    }
+session {
+  Coffee("Colombian", acmeId, 7.99, 0, 0).insert.
+    and(Coffee("French Roast", superiorCoffeeId, 8.99, 0, 0).insert).
+    and(Coffee("Espresso", theHighGroundId, 9.99, 0, 0).insert).
+    and(Coffee("Colombian Decaf", acmeId, 8.99, 0, 0).insert).
+    and(Coffee("French Roast Decaf", superiorCoffeeId, 9.99, 0, 0).insert).result
+}
 ```
      
 
@@ -146,13 +160,13 @@ Note that we need to use type-safe references for the suppliers.
 We've successfully inserted our `Supplier` instance. The syntax for querying it back out is similar to SQL:
 
 ```scala
-    import MapperDatastore._
-    import suppliers._
+import MapperDatastore._
+import suppliers._
 
-    session {
-      val query = select (*) from suppliers where name === "Starbucks"
-      query.to[Supplier].result.head()
-    }
+session {
+  val query = select (*) from suppliers where name === "Starbucks"
+  query.to[Supplier].result.head()
+}
 ```
      
 
@@ -162,17 +176,17 @@ The mapper will automatically match column names in the results to fields in the
 Use `ref` on a table definition to obtain its reference. It can then be used in queries and compared to foreign key columns like `supID`.
 
 ```scala
-    import MapperDatastore._
+import MapperDatastore._
 
-    session {
-      val query = (
-        select (coffees.name, suppliers.name)
-          from coffees
-          innerJoin suppliers
-          on coffees.supID === suppliers.ref
-        )
-      query.result.toList.mkString("\n")
-    }
+session {
+  val query = (
+    select (coffees.name, suppliers.name)
+      from coffees
+      innerJoin suppliers
+      on coffees.supID === suppliers.ref
+    )
+  query.result.toList.mkString("\n")
+}
 ```
      
 
@@ -180,20 +194,20 @@ Use `ref` on a table definition to obtain its reference. It can then be used in 
 Joins are one of the major points where ScalaRelational diverges from other frameworks that have a concept of an ORM:
 
 ```scala
-    import MapperDatastore._
+import MapperDatastore._
 
-    session {
-      val query = (
-        select (coffees.* ::: suppliers.*)
-          from coffees
-          innerJoin suppliers
-          on (coffees.supID === suppliers.ref)
-          where coffees.name === "French Roast"
-        )
+session {
+  val query = (
+    select (coffees.* ::: suppliers.*)
+      from coffees
+      innerJoin suppliers
+      on (coffees.supID === suppliers.ref)
+      where coffees.name === "French Roast"
+    )
 
-      val (frenchRoast, superior) = query.to[Coffee, Supplier](coffees, suppliers).result.head()
-      s"Coffee: $frenchRoast\nSupplier: $superior"
-    }
+  val (frenchRoast, superior) = query.to[Coffee, Supplier](coffees, suppliers).result.head()
+  s"Coffee: $frenchRoast\nSupplier: $superior"
+}
 ```
      
 
@@ -245,43 +259,43 @@ object UsersDatastore extends H2Datastore(mode = H2Memory("mapper")) {
 Create the tables:
 
 ```scala
-    import UsersDatastore._
+import UsersDatastore._
 
-    session {
-      create(users)
-    }
+session {
+  create(users)
+}
 ```
      
 
 Now you can insert a heterogeneous list of entities:
 
 ```scala
-    val insertUsers = Seq(
-      UserGuest("guest").insert,
-      UserAdmin("admin", canDelete = true).insert
-    )
+val insertUsers = Seq(
+  UserGuest("guest").insert,
+  UserAdmin("admin", canDelete = true).insert
+)
 
-    import UsersDatastore._
+import UsersDatastore._
 
-    session {
-      insertBatch(insertUsers).result
-    }
+session {
+  insertBatch(insertUsers).result
+}
 ```
      
 
 To query the table, you will need to evaluate the column which encodes the original type of the object, namely `isGuest` in this case. For more complex type hierarchies you may want to use an enumeration instead of a boolean flag.
 
 ```scala
-    import UsersDatastore._
-    val query = users.q from users
+import UsersDatastore._
+val query = users.q from users
 
-    val results = query.asCase[User] { row =>
-      if (row(users.isGuest)) classOf[UserGuest]
-      else classOf[UserAdmin]
-    }
+val results = query.asCase[User] { row =>
+  if (row(users.isGuest)) classOf[UserGuest]
+  else classOf[UserAdmin]
+}
 
-    session {
-      results.result.converted.toList.mkString("\n")
-    }
+session {
+  results.result.converted.toList.mkString("\n")
+}
 ```
      
