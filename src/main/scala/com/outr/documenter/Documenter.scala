@@ -17,6 +17,14 @@ object Test extends App {
   documenter.add("getting_started")
   documenter.add("mapper")
   documenter.add("querying")
+  documenter.add("tabledef")
+  documenter.add("architecture")
+  documenter.add("databases")
+  documenter.add("support")
+  documenter.add("contributing")
+  documenter.add("changelog")
+  documenter.add("benchmarks")
+  documenter.add("license")
 }
 
 class Documenter(outputDirectory: File) {

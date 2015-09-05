@@ -7,14 +7,14 @@ import org.scalarelational.manual.mapper._
  * @author Matt Hicks <matt@outr.com>
  */
 object TableDef extends SectionSupport {
-  section("") {
+  section("refs") {
     import MapperDatastore._
 
     val query = (
       select (coffees.*)
         from coffees
         innerJoin suppliers
-        on suppliers.id === coffees.supID
+        on suppliers.ref === coffees.supID
       )
   }
 }

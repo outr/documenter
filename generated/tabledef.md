@@ -1,5 +1,5 @@
 #Mapper
-See the chapter [link name="mapper"] for more information.
+See the chapter LINK for more information.
 }
 
 #Column types
@@ -23,7 +23,10 @@ The second type parameter denotes the underlying SQL type.
 
 You can call `opt` on every column to obtain its values wrapped in an optional column type. This is sometimes necessary when comparing an optional column with a non-optional column in a query:
 
-[scala type="section" section="refs"]
+```scala
+
+```
+     
 
 ##Blobs
 A column serialising an object looks as follows:
