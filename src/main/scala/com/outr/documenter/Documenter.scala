@@ -3,6 +3,7 @@ package com.outr.documenter
 import java.io.File
 import java.nio.file.Files
 
+import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.util.matching.Regex
@@ -265,9 +266,18 @@ object ScalaBlock extends BlockSupport {
     }
     val lines = forBlock(
       isStart = (s: String) => {
-        val b = s.trim.startsWith(s"""section("$name"""")
+        val b = s.contains(s"""section("$name"""")
         if (b) {
-          spacing = s.substring(0, s.indexOf('s'))
+          @tailrec
+          def countWhitespace(count: Int, s: String): Int = {
+            if (!s.charAt(0).isWhitespace) {
+              count
+            } else {
+              countWhitespace(count + 1, s.substring(1))
+            }
+          }
+          val length = countWhitespace(0, s)
+          spacing = s.substring(0, length)
         }
         b
       },
