@@ -15,6 +15,7 @@ object Test extends App {
   documenter.add("introduction")
   documenter.add("getting_started")
   documenter.add("mapper")
+  documenter.add("querying")
 }
 
 class Documenter(outputDirectory: File) {
