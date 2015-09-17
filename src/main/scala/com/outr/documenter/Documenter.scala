@@ -3,6 +3,8 @@ package com.outr.documenter
 import java.io.File
 import java.nio.file.Files
 
+import org.powerscala.reflect.EnhancedClass
+
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -250,6 +252,10 @@ object ScalaBlock extends BlockSupport {
   }
 
   def section(name: String) = {
+    val className = s"${PackageBlock.current.get}.${filename.get}"
+    val clazz: EnhancedClass = getClass.getClassLoader.loadClass(className)
+    val companion = clazz.instance.getOrElse(throw new RuntimeException(s"No companion object for $className")).asInstanceOf[SectionSupport]
+    println(s"$className - $clazz - $companion")
     var spacing = ""
     var length = -1
     val trimmer = (line: String) => {

@@ -100,15 +100,11 @@ object Mapper extends SectionSupport {
   }
 
   section("usersInsert") {
-    val insertUsers = Seq(
-      UserGuest("guest").insert,
-      UserAdmin("admin", canDelete = true).insert
-    )
-
     import UsersDatastore._
 
     session {
-      insertBatch(insertUsers).result
+      UserGuest("guest").insert.result
+      UserAdmin("admin", canDelete = true).insert.result
     }
   }
 

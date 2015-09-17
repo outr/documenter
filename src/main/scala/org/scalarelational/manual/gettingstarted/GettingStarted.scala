@@ -6,6 +6,10 @@ import com.outr.documenter.SectionSupport
  * @author Matt Hicks <matt@outr.com>
  */
 object GettingStarted extends SectionSupport {
+  var acmeId: Int = _
+  var superiorCoffeeId: Int = _
+  var theHighGroundId: Int = _
+
   section("create") {
     import GettingStartedDatastore._
 
@@ -14,7 +18,7 @@ object GettingStarted extends SectionSupport {
     }
   }
   
-  section("createVerbose", invoke = false) {
+  sectionNoExec("createVerbose") {
     GettingStartedDatastore.session {
       GettingStartedDatastore.create(
         GettingStartedDatastore.suppliers,
@@ -23,7 +27,7 @@ object GettingStarted extends SectionSupport {
     }
   }
 
-  section("createAliased", invoke = false) {
+  sectionNoExec("createAliased") {
     def ds = GettingStartedDatastore
 
     ds.session {
@@ -36,10 +40,8 @@ object GettingStarted extends SectionSupport {
     import suppliers._
 
     session {
-      insert(id(101), name("Acme, Inc."), street("99 Market Street"),
-        city("Groundsville"), state("CA"), zip("95199")).result
-      insert(id(49), name("Superior Coffee"), street("1 Party Place"),
-        city("Mendocino"), state("CA"), zip("95460")).result
+      acmeId = insert(name("Acme, Inc."), street("99 Market Street"), city("Groundsville"), state("CA"), zip("95199")).result
+      superiorCoffeeId = insert(id(49), name("Superior Coffee"), street("1 Party Place"), city("Mendocino"), state("CA"), zip("95460")).result
     }
   }
 
@@ -47,7 +49,7 @@ object GettingStarted extends SectionSupport {
     import GettingStartedDatastore._
 
     session {
-      insertInto(suppliers, 150, "The High Ground", "100 Coffee Lane", "Meadows", "CA", "93966").result
+      theHighGroundId = insertInto(suppliers, 150, "The High Ground", "100 Coffee Lane", "Meadows", "CA", "93966").result
     }
   }
 
@@ -56,11 +58,11 @@ object GettingStarted extends SectionSupport {
     import coffees._
 
     session {
-      insert(name("Colombian"), supID(101), price(7.99), sales(0), total(0)).
-        and(name("French Roast"), supID(49), price(8.99), sales(0), total(0)).
-        and(name("Espresso"), supID(150), price(9.99), sales(0), total(0)).
-        and(name("Colombian Decaf"), supID(101), price(8.99), sales(0), total(0)).
-        and(name("French Roast Decaf"), supID(49), price(9.99), sales(0), total(0)).result
+      insert(name("Colombian"), supID(acmeId), price(7.99), sales(0), total(0)).
+        and(name("French Roast"), supID(superiorCoffeeId), price(8.99), sales(0), total(0)).
+        and(name("Espresso"), supID(theHighGroundId), price(9.99), sales(0), total(0)).
+        and(name("Colombian Decaf"), supID(acmeId), price(8.99), sales(0), total(0)).
+        and(name("French Roast Decaf"), supID(superiorCoffeeId), price(9.99), sales(0), total(0)).result
     }
   }
 

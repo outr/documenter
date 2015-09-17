@@ -14,8 +14,10 @@ If you'd prefer to use another database instead, please refer to the chapter LIN
 You will need the following imports:
 
 ```scala
+import org.powerscala.log.Level
 import org.scalarelational.column.property.{AutoIncrement, ForeignKey, PrimaryKey, Unique}
 import org.scalarelational.h2.{H2Datastore, H2Memory}
+import org.scalarelational.model.SQLLogging
 import org.scalarelational.table.Table
 ```
      
@@ -24,7 +26,9 @@ import org.scalarelational.table.Table
 The next thing you need is the database representation in Scala. The schema can map to an existing database or you can use it to create the tables in your database:
 
 ```scala
-object GettingStartedDatastore extends H2Datastore(mode = H2Memory("getting_started")) {
+object GettingStartedDatastore extends H2Datastore(mode = H2Memory("getting_started")) with SQLLogging {
+  sqlLogLevel := Level.Info
+
   object suppliers extends Table("SUPPLIERS") {
     val name = column[String]("SUP_NAME", Unique)
     val street = column[String]("STREET")
@@ -66,23 +70,14 @@ All database queries must take place within a *session*. Sessions will be explai
 You'll notice we imported `ExampleDatastore._` in an effort to minimise the amount of code required here. We can explicitly write it more verbosely like this:
 
 ```scala
-GettingStartedDatastore.session {
-  GettingStartedDatastore.create(
-    GettingStartedDatastore.suppliers,
-    GettingStartedDatastore.coffees
-  )
-}
+
 ```
      
 
 For the sake of readability importing the datastore is generally suggested. Although if namespace collisions are a problem you can import and alias or create a shorter reference like this:
 
 ```scala
-def ds = GettingStartedDatastore
 
-ds.session {
-  ds.create(ds.suppliers, ds.coffees)
-}
 ```
      
 
@@ -94,10 +89,8 @@ import GettingStartedDatastore._
 import suppliers._
 
 session {
-  insert(id(101), name("Acme, Inc."), street("99 Market Street"),
-    city("Groundsville"), state("CA"), zip("95199")).result
-  insert(id(49), name("Superior Coffee"), street("1 Party Place"),
-    city("Mendocino"), state("CA"), zip("95460")).result
+  acmeId = insert(name("Acme, Inc."), street("99 Market Street"), city("Groundsville"), state("CA"), zip("95199")).result
+  superiorCoffeeId = insert(id(49), name("Superior Coffee"), street("1 Party Place"), city("Mendocino"), state("CA"), zip("95460")).result
 }
 ```
      
@@ -110,7 +103,7 @@ There is also a shorthand when using values in order:
 import GettingStartedDatastore._
 
 session {
-  insertInto(suppliers, 150, "The High Ground", "100 Coffee Lane", "Meadows", "CA", "93966").result
+  theHighGroundId = insertInto(suppliers, 150, "The High Ground", "100 Coffee Lane", "Meadows", "CA", "93966").result
 }
 ```
      
@@ -124,11 +117,11 @@ import GettingStartedDatastore._
 import coffees._
 
 session {
-  insert(name("Colombian"), supID(101), price(7.99), sales(0), total(0)).
-    and(name("French Roast"), supID(49), price(8.99), sales(0), total(0)).
-    and(name("Espresso"), supID(150), price(9.99), sales(0), total(0)).
-    and(name("Colombian Decaf"), supID(101), price(8.99), sales(0), total(0)).
-    and(name("French Roast Decaf"), supID(49), price(9.99), sales(0), total(0)).result
+  insert(name("Colombian"), supID(acmeId), price(7.99), sales(0), total(0)).
+    and(name("French Roast"), supID(superiorCoffeeId), price(8.99), sales(0), total(0)).
+    and(name("Espresso"), supID(theHighGroundId), price(9.99), sales(0), total(0)).
+    and(name("Colombian Decaf"), supID(acmeId), price(8.99), sales(0), total(0)).
+    and(name("French Roast Decaf"), supID(superiorCoffeeId), price(9.99), sales(0), total(0)).result
 }
 ```
      
