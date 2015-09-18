@@ -5,10 +5,10 @@ This chapter will guide you through creating your first project with ScalaRelati
 The first thing you need to do is add ScalaRelational's H2 module to your sbt project:
 
 ```scala
-libraryDependencies += "org.scalarelational" %% "scalarelational-h2" % "1.1.0-SNAPSHOT"
+libraryDependencies += "org.scalarelational" %% "scalarelational-h2" % "1.1.0"
 ```
 
-If you'd prefer to use another database instead, please refer to the chapter LINK.
+If you'd prefer to use another database instead, please refer to the chapter [databases](databases.md).
 
 #Library imports
 You will need the following imports:
@@ -46,7 +46,7 @@ object GettingStartedDatastore extends H2Datastore(mode = H2Memory("getting_star
 ```
          
 
-Our `Datastore` contains `Table`s and our `Table`s contain `Column`s. As for the `Datastore` we have chosen an in-memory H2 database. Every column type must have a `DataType` associated with it. You don't see it referenced above because all standard Scala types have predefined implicit conversions available FOOTNOTE. If you need to use a type that is not supported by ScalaRelational, please refer to LINK.
+Our `Datastore` contains `Table`s and our `Table`s contain `Column`s. As for the `Datastore` we have chosen an in-memory H2 database. Every column type must have a `DataType` associated with it. You don't see it referenced above because all standard Scala types have predefined implicit conversions available. [See the `DataTypeSupport` trait for more information](https://github.com/outr/scalarelational/blob/master/core/src/main/scala/org/scalarelational/datatype/DataTypeSupport.scala).
 
 #Create the database
 Now that we have our schema defined in Scala, we need to create the tables in the database:
@@ -60,25 +60,35 @@ session {
 ```
 
 ##### Result
+
 ```scala
 3
 ```
          
 
-All database queries must take place within a *session*. Sessions will be explained in LINK.
+All database queries must take place within a *session*.
 
 ##Import
 You'll notice we imported `ExampleDatastore._` in an effort to minimise the amount of code required here. We can explicitly write it more verbosely like this:
 
 ```scala
-
+GettingStartedDatastore.session {
+  GettingStartedDatastore.create(
+    GettingStartedDatastore.suppliers,
+    GettingStartedDatastore.coffees
+  )
+}
 ```
          
 
 For the sake of readability importing the datastore is generally suggested. Although if namespace collisions are a problem you can import and alias or create a shorter reference like this:
 
 ```scala
+def ds = GettingStartedDatastore
 
+ds.session {
+  ds.create(ds.suppliers, ds.coffees)
+}
 ```
          
 
@@ -127,6 +137,7 @@ session {
 ```
 
 ##### Result
+
 ```scala
 List(5)
 ```
@@ -149,6 +160,7 @@ session {
 ```
 
 ##### Result
+
 ```scala
 List(16)
 ```
@@ -171,6 +183,7 @@ session {
 ```
 
 ##### Result
+
 ```scala
 Colombian	1	7.99	0	0
 French Roast	49	8.99	0	0
@@ -206,6 +219,7 @@ session {
 ```
 
 ##### Result
+
 ```scala
 Colombian  1  7.99  0  0
 French Roast  49  8.99  0  0
@@ -244,6 +258,7 @@ session {
 ```
 
 ##### Result
+
 ```scala
 Coffee: Colombian, Supplier: Acme, Inc.
 Coffee: French Roast, Supplier: Superior Coffee

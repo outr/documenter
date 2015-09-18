@@ -5,10 +5,10 @@ This chapter will guide you through creating your first project with ScalaRelati
 The first thing you need to do is add ScalaRelational's H2 module to your sbt project:
 
 ```scala
-libraryDependencies += "org.scalarelational" %% "scalarelational-h2" % "1.1.0-SNAPSHOT"
+libraryDependencies += "org.scalarelational" %% "scalarelational-h2" % "1.1.0"
 ```
 
-If you'd prefer to use another database instead, please refer to the chapter [link name="ch-database-support"].
+If you'd prefer to use another database instead, please refer to the chapter [databases](databases.md).
 
 #Library imports
 You will need the following imports:
@@ -20,14 +20,14 @@ The next thing you need is the database representation in Scala. The schema can 
 
 [scala type="object"]
 
-Our `Datastore` contains `Table`s and our `Table`s contain `Column`s. As for the `Datastore` we have chosen an in-memory H2 database. Every column type must have a `DataType` associated with it. You don't see it referenced above because all standard Scala types have predefined implicit conversions available [footnote text="See the `DataTypeSupport` trait for more information" url="https://github.com/outr/scalarelational/blob/master/core/src/main/scala/org/scalarelational/datatype/DataTypeSupport.scala"]. If you need to use a type that is not supported by ScalaRelational, please refer to [link name="custom-column-type"].
+Our `Datastore` contains `Table`s and our `Table`s contain `Column`s. As for the `Datastore` we have chosen an in-memory H2 database. Every column type must have a `DataType` associated with it. You don't see it referenced above because all standard Scala types have predefined implicit conversions available. [See the `DataTypeSupport` trait for more information](https://github.com/outr/scalarelational/blob/master/core/src/main/scala/org/scalarelational/datatype/DataTypeSupport.scala).
 
 #Create the database
 Now that we have our schema defined in Scala, we need to create the tables in the database:
 
 [scala type="section" filename="GettingStarted" section="create"]
 
-All database queries must take place within a *session*. Sessions will be explained in [link name="session-management"].
+All database queries must take place within a *session*.
 
 ##Import
 You'll notice we imported `ExampleDatastore._` in an effort to minimise the amount of code required here. We can explicitly write it more verbosely like this:

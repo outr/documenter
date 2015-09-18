@@ -28,6 +28,6 @@ object GettingStartedDatastore extends MariaDBDatastore(config) {
 }
 ```
 
-Alternatively, you can specify a custom length for some selected columns (see [link name="custom-column-length" label="this section"]).
+Alternatively, you can specify a custom length for some selected columns.
 
 Please note that unlike MariaDB, MySQL does not support the clause `CREATE INDEX IF NOT EXISTS`.

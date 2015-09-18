@@ -1,6 +1,6 @@
+
 #Mapper
-See the chapter LINK for more information.
-}
+See the chapter [mapper](mapper.md) for more information.
 
 #Column types
 ##References
@@ -24,7 +24,14 @@ The second type parameter denotes the underlying SQL type.
 You can call `opt` on every column to obtain its values wrapped in an optional column type. This is sometimes necessary when comparing an optional column with a non-optional column in a query:
 
 ```scala
+import MapperDatastore._
 
+val query = (
+  select (coffees.*)
+    from coffees
+    innerJoin suppliers
+    on suppliers.ref === coffees.supID
+  )
 ```
          
 

@@ -5,9 +5,9 @@ The mapper module provides functionality to map table rows when persisting or se
 We must first add another dependency to our build file:
 
 ```scala
-libraryDependencies += "org.scalarelational" %% "scalarelational-mapper" % "1.1.0-SNAPSHOT"
+libraryDependencies += "org.scalarelational" %% "scalarelational-mapper" % "1.1.0"
 
-libraryDependencies += "org.scalarelational" %% "scalarelational-h2" % "1.1.0-SNAPSHOT"
+libraryDependencies += "org.scalarelational" %% "scalarelational-h2" % "1.1.0"
 ```
 
 #Library imports

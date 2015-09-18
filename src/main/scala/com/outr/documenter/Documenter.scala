@@ -188,6 +188,7 @@ object ScalaBlock extends BlockSupport {
 
   private def scalaBlock(lines: List[String], result: Option[Any]) = {
     val linesString = lines.mkString("\n")
+    if (linesString.trim.isEmpty) throw new RuntimeException("Empty Scala block!")
     result match {
       case Some(r) =>
         s"""```scala
@@ -195,6 +196,7 @@ object ScalaBlock extends BlockSupport {
            |```
            |
            |##### Result
+           |
            |```scala
            |${r.toString}
            |```
@@ -296,7 +298,7 @@ object ScalaBlock extends BlockSupport {
     }
     val lines = forBlock(
       isStart = (s: String) => {
-        val b = s.contains(s"""section("$name"""")
+        val b = s.contains(s"""section("$name"""") || s.contains(s"""sectionNoExec("$name"""")
         if (b) {
           @tailrec
           def countWhitespace(count: Int, s: String): Int = {
