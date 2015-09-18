@@ -18,6 +18,7 @@ object Mapper extends SectionSupport {
 
   section("insertSupplier") {
     import MapperDatastore._
+
     session {
       val starbucks = Supplier("Starbucks", "123 Everywhere Rd.", "Lotsaplaces", Some("CA"), "93966")
       starbucks.insert.result

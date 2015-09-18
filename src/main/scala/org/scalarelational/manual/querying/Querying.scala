@@ -47,9 +47,13 @@ object Querying extends SectionSupport {
   }
 
   section("tuple") {
-    query.result.toList.map { r =>
-      val (coffeeName, supplierName) = r()
-      s"Coffee: $coffeeName, Supplier: $supplierName"
+    import MapperDatastore._
+
+    session {
+      query.result.toList.map { r =>
+        val (coffeeName, supplierName) = r()
+        s"Coffee: $coffeeName, Supplier: $supplierName"
+      }
     }
   }
 
@@ -57,15 +61,19 @@ object Querying extends SectionSupport {
     import MapperDatastore._
     import coffees._
 
-    val query = update(name("updated name")) where id === Some(1)
-    query.result
+    session {
+      val query = update(name("updated name")) where id === Some(1)
+      query.result
+    }
   }
 
   section("delete") {
     import MapperDatastore._
 
-    val query = delete(coffees) where coffees.id === Some(1)
-    query.result
+    session {
+      val query = delete(coffees) where coffees.id === Some(1)
+      query.result
+    }
   }
 
   section("functions") {

@@ -101,6 +101,7 @@ We've create a `Supplier` case class, but now we need to create an instance and 
 
 ```scala
 import MapperDatastore._
+
 session {
   val starbucks = Supplier("Starbucks", "123 Everywhere Rd.", "Lotsaplaces", Some("CA"), "93966")
   starbucks.insert.result
@@ -244,7 +245,7 @@ case class UserAdmin(name: String, canDelete: Boolean, id: Option[Int] = None) e
 
 ```scala
 object UsersDatastore extends H2Datastore(mode = H2Memory("mapper")) {
-  object users extends MappedTable[User]("users")(MapperDatastore) {
+  object users extends MappedTable[User]("users") {
     val id = column[Option[Int], Int]("id", PrimaryKey, AutoIncrement)
     val name = column[String]("name")
     val canDelete = column[Boolean]("canDelete", Polymorphic)
@@ -270,15 +271,11 @@ session {
 Now you can insert a heterogeneous list of entities:
 
 ```scala
-val insertUsers = Seq(
-  UserGuest("guest").insert,
-  UserAdmin("admin", canDelete = true).insert
-)
-
 import UsersDatastore._
 
 session {
-  insertBatch(insertUsers).result
+  UserGuest("guest").insert.result
+  UserAdmin("admin", canDelete = true).insert.result
 }
 ```
      

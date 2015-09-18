@@ -1,17 +1,13 @@
 package org.scalarelational.manual.gettingstarted
 
-import org.powerscala.log.Level
 import org.scalarelational.column.property.{AutoIncrement, ForeignKey, PrimaryKey, Unique}
 import org.scalarelational.h2.{H2Datastore, H2Memory}
-import org.scalarelational.model.SQLLogging
 import org.scalarelational.table.Table
 
 /**
  * @author Matt Hicks <matt@outr.com>
  */
-object GettingStartedDatastore extends H2Datastore(mode = H2Memory("getting_started")) with SQLLogging {
-  sqlLogLevel := Level.Info
-
+object GettingStartedDatastore extends H2Datastore(mode = H2Memory("getting_started")) {
   object suppliers extends Table("SUPPLIERS") {
     val name = column[String]("SUP_NAME", Unique)
     val street = column[String]("STREET")

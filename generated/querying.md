@@ -66,9 +66,13 @@ You can see here that though this query looks very similar to an SQL query there
 ScalaRelational tries to retain type information where possible, and though loading data by columns is clean, we can actually extract a `(String, String)` tuple representing the coffee name and supplier's name:
 
 ```scala
-query.result.toList.map { r =>
-  val (coffeeName, supplierName) = r()
-  s"Coffee: $coffeeName, Supplier: $supplierName"
+import MapperDatastore._
+
+session {
+  query.result.toList.map { r =>
+    val (coffeeName, supplierName) = r()
+    s"Coffee: $coffeeName, Supplier: $supplierName"
+  }
 }
 ```
      
@@ -82,8 +86,10 @@ This is an example for updating a row:
 import MapperDatastore._
 import coffees._
 
-val query = update(name("updated name")) where id === Some(1)
-query.result
+session {
+  val query = update(name("updated name")) where id === Some(1)
+  query.result
+}
 ```
      
 
@@ -93,8 +99,10 @@ In analogy to updating rows, a deletion looks as follows:
 ```scala
 import MapperDatastore._
 
-val query = delete(coffees) where coffees.id === Some(1)
-query.result
+session {
+  val query = delete(coffees) where coffees.id === Some(1)
+  query.result
+}
 ```
      
 
