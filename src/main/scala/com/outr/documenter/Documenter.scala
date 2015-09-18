@@ -194,7 +194,7 @@ object ScalaBlock extends BlockSupport {
            |$linesString
            |```
            |
-           |### Result
+           |##### Result
            |```scala
            |${r.toString}
            |```

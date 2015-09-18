@@ -59,7 +59,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 3
 ```
@@ -126,7 +126,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 List(5)
 ```
@@ -148,7 +148,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 List(16)
 ```
@@ -170,7 +170,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 Colombian	1	7.99	0	0
 French Roast	49	8.99	0	0
@@ -205,7 +205,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 Colombian  1  7.99  0  0
 French Roast  49  8.99  0  0
@@ -243,7 +243,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 Coffee: Colombian, Supplier: Acme, Inc.
 Coffee: French Roast, Supplier: Superior Coffee

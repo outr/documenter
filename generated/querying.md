@@ -24,7 +24,7 @@ session {
 }.mkString("\n")
 ```
 
-### Result
+##### Result
 ```scala
 Colombian	2	7.99	0	0
 French Roast	3	8.99	0	0
@@ -58,7 +58,7 @@ import MapperDatastore._
 )
 ```
 
-### Result
+##### Result
 ```scala
 Query((COF_NAME,SUP_NAME),COFFEES,List(Join(SUPPLIERS,Inner,ColumnCondition(SUP_ID,Equal,RefColumn(SUP_ID)))),DirectCondition(PRICE,LessThan,9.0),List(),List(),-1,-1,<function1>,None)
 ```
@@ -74,7 +74,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 Coffee: Colombian, Supplier: Acme, Inc.
 Coffee: French Roast, Supplier: Superior Coffee
@@ -97,7 +97,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 List(Coffee: Colombian, Supplier: Acme, Inc., Coffee: French Roast, Supplier: Superior Coffee, Coffee: Colombian Decaf, Supplier: Acme, Inc.)
 ```
@@ -118,7 +118,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 1
 ```
@@ -136,7 +136,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 1
 ```
@@ -156,7 +156,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 Min Price: 8.99, Max Price: 9.99
 ```

@@ -64,7 +64,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 3
 ```
@@ -113,7 +113,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 1
 ```
@@ -147,7 +147,7 @@ transaction {
 }
 ```
 
-### Result
+##### Result
 ```scala
 (2,3,4)
 ```
@@ -169,7 +169,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 List(5)
 ```
@@ -190,7 +190,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 Supplier(Starbucks,123 Everywhere Rd.,Lotsaplaces,Some(CA),93966,Some(1))
 ```
@@ -215,7 +215,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 COFFEES(COF_NAME: Colombian, SUP_NAME: Acme, Inc.)
 COFFEES(COF_NAME: French Roast, SUP_NAME: Superior Coffee)
@@ -245,7 +245,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 Coffee: Coffee(French Roast,3,8.99,0,0,Some(2))
 Supplier: Supplier(Superior Coffee,1 Party Place,Mendocino,None,95460,Some(3))
@@ -307,7 +307,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 1
 ```
@@ -324,7 +324,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 2
 ```
@@ -346,7 +346,7 @@ session {
 }
 ```
 
-### Result
+##### Result
 ```scala
 UserGuest(guest,Some(1))
 UserAdmin(admin,true,Some(2))
