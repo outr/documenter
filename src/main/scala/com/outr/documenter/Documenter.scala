@@ -186,11 +186,27 @@ object ScalaBlock extends BlockSupport {
     lines.toList
   }
 
-  private def scalaBlock(lines: List[String]) =
-    s"""```scala
-       |${lines.mkString("\n")}
-       |```
-     """.stripMargin
+  private def scalaBlock(lines: List[String], result: Option[Any]) = {
+    val linesString = lines.mkString("\n")
+    result match {
+      case Some(r) =>
+        s"""```scala
+           |$linesString
+           |```
+           |
+           |### Result
+           |```scala
+           |${r.toString}
+           |```
+         """.stripMargin
+      case None => {
+        s"""```scala
+           |$linesString
+           |```
+         """.stripMargin
+      }
+    }
+  }
 
   def imports() = {
     val imports = forBlock(
@@ -198,7 +214,7 @@ object ScalaBlock extends BlockSupport {
       (s: String) => s.startsWith("class") || s.startsWith("object"),
       (s: String) => if (s.startsWith("import")) Some(s) else None,
       includeEnd = false)
-    scalaBlock(imports)
+    scalaBlock(imports, None)
   }
 
   private def trimmingProcessor(length: => Int) = (line: String) => Some(if (line.length > length) line.substring(length) else line)
@@ -212,7 +228,7 @@ object ScalaBlock extends BlockSupport {
       }
       b
     }, (s: String) => s == s"$spacing}", trimmingProcessor(spacing.length))
-    scalaBlock(lines)
+    scalaBlock(lines, None)
   }
 
   def handleClass() = {
@@ -224,7 +240,7 @@ object ScalaBlock extends BlockSupport {
       }
       b
     }, (s: String) => s == s"$spacing}", trimmingProcessor(spacing.length))
-    scalaBlock(lines)
+    scalaBlock(lines, None)
   }
 
   def handleCaseClass() = {
@@ -236,7 +252,7 @@ object ScalaBlock extends BlockSupport {
       }
       b
     }, (s: String) => s == s"$spacing}", trimmingProcessor(spacing.length))
-    scalaBlock(lines)
+    scalaBlock(lines, None)
   }
 
   def handleTrait() = {
@@ -248,14 +264,14 @@ object ScalaBlock extends BlockSupport {
       }
       b
     }, (s: String) => s == s"$spacing}", trimmingProcessor(spacing.length))
-    scalaBlock(lines)
+    scalaBlock(lines, None)
   }
 
   def section(name: String) = {
     val className = s"${PackageBlock.current.get}.${filename.get}"
     val clazz: EnhancedClass = getClass.getClassLoader.loadClass(className)
     val companion = clazz.instance.getOrElse(throw new RuntimeException(s"No companion object for $className")).asInstanceOf[SectionSupport]
-    println(s"$className - $clazz - $companion")
+    val result = companion.sectionResult(name)
     var spacing = ""
     var length = -1
     val trimmer = (line: String) => {
@@ -300,7 +316,7 @@ object ScalaBlock extends BlockSupport {
       includeStart = false,
       includeEnd = false
     )
-    scalaBlock(lines)
+    scalaBlock(lines, result)
   }
 }
 

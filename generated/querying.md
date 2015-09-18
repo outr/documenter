@@ -23,7 +23,16 @@ session {
   }
 }.mkString("\n")
 ```
-     
+
+### Result
+```scala
+Colombian	2	7.99	0	0
+French Roast	3	8.99	0	0
+Espresso	4	9.99	0	0
+Colombian Decaf	2	8.99	0	0
+French Roast Decaf	3	9.99	0	0
+```
+         
 
 `toList` is necessary because `result` returns a `QueryResultsIterator` which streams from the database and expects an active session. If you plan to use the rows outside of the session you must convert them to a concrete sequence first.
 
@@ -48,7 +57,12 @@ import MapperDatastore._
     coffees.price < 9.0
 )
 ```
-     
+
+### Result
+```scala
+Query((COF_NAME,SUP_NAME),COFFEES,List(Join(SUPPLIERS,Inner,ColumnCondition(SUP_ID,Equal,RefColumn(SUP_ID)))),DirectCondition(PRICE,LessThan,9.0),List(),List(),-1,-1,<function1>,None)
+```
+         
 
 ```scala
 import MapperDatastore._
@@ -59,7 +73,14 @@ session {
   }.mkString("\n")
 }
 ```
-     
+
+### Result
+```scala
+Coffee: Colombian, Supplier: Acme, Inc.
+Coffee: French Roast, Supplier: Superior Coffee
+Coffee: Colombian Decaf, Supplier: Acme, Inc.
+```
+         
 
 You can see here that though this query looks very similar to an SQL query there are some slight differences. This is the result of Scala's limitations for writing DSLs. For example, we must use three equal signs (`===`) instead of two.
 
@@ -75,7 +96,12 @@ session {
   }
 }
 ```
-     
+
+### Result
+```scala
+List(Coffee: Colombian, Supplier: Acme, Inc., Coffee: French Roast, Supplier: Superior Coffee, Coffee: Colombian Decaf, Supplier: Acme, Inc.)
+```
+         
 
 This is possible because the DSL supports explicit argument lists and retains type information all the way through to the result.
 
@@ -91,7 +117,12 @@ session {
   query.result
 }
 ```
-     
+
+### Result
+```scala
+1
+```
+         
 
 #Delete
 In analogy to updating rows, a deletion looks as follows:
@@ -104,7 +135,12 @@ session {
   query.result
 }
 ```
-     
+
+### Result
+```scala
+1
+```
+         
 
 #SQL functions
 ScalaRelational supports SQL functions such as `min` and `max`. These are defined directly on the columns like the following:
@@ -119,4 +155,9 @@ session {
   s"Min Price: $min, Max Price: $max"
 }
 ```
-     
+
+### Result
+```scala
+Min Price: 8.99, Max Price: 9.99
+```
+         

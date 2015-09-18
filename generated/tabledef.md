@@ -26,7 +26,7 @@ You can call `opt` on every column to obtain its values wrapped in an optional c
 ```scala
 
 ```
-     
+         
 
 ##Blobs
 A column serialising an object looks as follows:

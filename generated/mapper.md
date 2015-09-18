@@ -19,7 +19,7 @@ import org.scalarelational.datatype.Ref
 import org.scalarelational.h2.{H2Datastore, H2Memory}
 import org.scalarelational.mapper._
 ```
-     
+         
 
 #Table definition
 When defining a table definition with the mapper, the key difference is that you need to use `MappedTable`  and supply the `case class` you want to map it to. We change the example from the previous chapter to:
@@ -49,7 +49,7 @@ object MapperDatastore extends H2Datastore(mode = H2Memory("mapper")) {
   }
 }
 ```
-     
+         
 
 You may have noticed that the supplier ID in `coffees` now has a type-safe reference. The second type argument of `column` denotes the underlying SQL type, which in case of foreign keys is an integer.
 
@@ -63,7 +63,12 @@ session {
   create(suppliers, coffees)
 }
 ```
-     
+
+### Result
+```scala
+3
+```
+         
 
 #Entities
 Along with the table definition, you have to declare an accompanying `case class`, which is called *entity*. An entity needs to contain exactly the same columns as the table and the columns must have the same types.
@@ -80,7 +85,7 @@ case class Supplier(name: String,
   def columns = mapTo[Supplier](MapperDatastore.suppliers)
 }
 ```
-     
+         
 
 ```scala
 case class Coffee(name: String,
@@ -92,7 +97,7 @@ case class Coffee(name: String,
   def columns = mapTo[Coffee](MapperDatastore.coffees)
 }
 ```
-     
+         
 
 Though all of these fields are in the same order as the table, this is not required to be the case. Mapping takes place based on the field name to the column name in the table, so order doesn't matter.
 
@@ -107,7 +112,12 @@ session {
   starbucks.insert.result
 }
 ```
-     
+
+### Result
+```scala
+1
+```
+         
 
 It is worth noting here that the result is the database-generated primary key.
 
@@ -120,7 +130,7 @@ object Ids {
   var theHighGroundId: Ref[Supplier] = _
 }
 ```
-     
+         
 
 And insert some additional suppliers and capture their ids:
 
@@ -136,7 +146,12 @@ transaction {
   (acmeId, superiorCoffeeId, theHighGroundId)
 }
 ```
-     
+
+### Result
+```scala
+(2,3,4)
+```
+         
 
 #Batch inserting
 Now that we have some suppliers, we need to add some coffees as well:
@@ -153,7 +168,12 @@ session {
     and(Coffee("French Roast Decaf", superiorCoffeeId, 9.99, 0, 0).insert).result
 }
 ```
-     
+
+### Result
+```scala
+List(5)
+```
+         
 
 Note that we need to use type-safe references for the suppliers.
 
@@ -169,7 +189,12 @@ session {
   query.to[Supplier].result.head()
 }
 ```
-     
+
+### Result
+```scala
+Supplier(Starbucks,123 Everywhere Rd.,Lotsaplaces,Some(CA),93966,Some(1))
+```
+         
 
 The mapper will automatically match column names in the results to fields in the `case class` provided. Every query can have its own class for convenience mapping.
 
@@ -189,7 +214,16 @@ session {
   query.result.toList.mkString("\n")
 }
 ```
-     
+
+### Result
+```scala
+COFFEES(COF_NAME: Colombian, SUP_NAME: Acme, Inc.)
+COFFEES(COF_NAME: French Roast, SUP_NAME: Superior Coffee)
+COFFEES(COF_NAME: Espresso, SUP_NAME: The High Ground)
+COFFEES(COF_NAME: Colombian Decaf, SUP_NAME: Acme, Inc.)
+COFFEES(COF_NAME: French Roast Decaf, SUP_NAME: Superior Coffee)
+```
+         
 
 ##Using joins
 Joins are one of the major points where ScalaRelational diverges from other frameworks that have a concept of an ORM:
@@ -210,7 +244,13 @@ session {
   s"Coffee: $frenchRoast\nSupplier: $superior"
 }
 ```
-     
+
+### Result
+```scala
+Coffee: Coffee(French Roast,3,8.99,0,0,Some(2))
+Supplier: Supplier(Superior Coffee,1 Party Place,Mendocino,None,95460,Some(3))
+```
+         
 
 This is an efficient SQL query to join the `coffees` table with the `suppliers` table and get back a single result set. Using the mapper we are able to separate the columns relating to `coffees` from `suppliers` and map them directly to our `case class`es.
 
@@ -223,7 +263,7 @@ trait User {
   def id: Option[Int]
 }
 ```
-     
+         
 
 ```scala
 case class UserGuest(name: String, id: Option[Int] = None) extends User with Entity[UserGuest] {
@@ -232,7 +272,7 @@ case class UserGuest(name: String, id: Option[Int] = None) extends User with Ent
   val isGuest = true
 }
 ```
-     
+         
 
 ```scala
 case class UserAdmin(name: String, canDelete: Boolean, id: Option[Int] = None) extends User with Entity[UserAdmin] {
@@ -241,7 +281,7 @@ case class UserAdmin(name: String, canDelete: Boolean, id: Option[Int] = None) e
   val isGuest = false
 }
 ```
-     
+         
 
 ```scala
 object UsersDatastore extends H2Datastore(mode = H2Memory("mapper")) {
@@ -255,7 +295,7 @@ object UsersDatastore extends H2Datastore(mode = H2Memory("mapper")) {
   }
 }
 ```
-     
+         
 
 Create the tables:
 
@@ -266,7 +306,12 @@ session {
   create(users)
 }
 ```
-     
+
+### Result
+```scala
+1
+```
+         
 
 Now you can insert a heterogeneous list of entities:
 
@@ -278,7 +323,12 @@ session {
   UserAdmin("admin", canDelete = true).insert.result
 }
 ```
-     
+
+### Result
+```scala
+2
+```
+         
 
 To query the table, you will need to evaluate the column which encodes the original type of the object, namely `isGuest` in this case. For more complex type hierarchies you may want to use an enumeration instead of a boolean flag.
 
@@ -295,4 +345,10 @@ session {
   results.result.converted.toList.mkString("\n")
 }
 ```
-     
+
+### Result
+```scala
+UserGuest(guest,Some(1))
+UserAdmin(admin,true,Some(2))
+```
+         

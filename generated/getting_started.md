@@ -14,21 +14,17 @@ If you'd prefer to use another database instead, please refer to the chapter LIN
 You will need the following imports:
 
 ```scala
-import org.powerscala.log.Level
 import org.scalarelational.column.property.{AutoIncrement, ForeignKey, PrimaryKey, Unique}
 import org.scalarelational.h2.{H2Datastore, H2Memory}
-import org.scalarelational.model.SQLLogging
 import org.scalarelational.table.Table
 ```
-     
+         
     
 #Schema
 The next thing you need is the database representation in Scala. The schema can map to an existing database or you can use it to create the tables in your database:
 
 ```scala
-object GettingStartedDatastore extends H2Datastore(mode = H2Memory("getting_started")) with SQLLogging {
-  sqlLogLevel := Level.Info
-
+object GettingStartedDatastore extends H2Datastore(mode = H2Memory("getting_started")) {
   object suppliers extends Table("SUPPLIERS") {
     val name = column[String]("SUP_NAME", Unique)
     val street = column[String]("STREET")
@@ -48,7 +44,7 @@ object GettingStartedDatastore extends H2Datastore(mode = H2Memory("getting_star
   }
 }
 ```
-     
+         
 
 Our `Datastore` contains `Table`s and our `Table`s contain `Column`s. As for the `Datastore` we have chosen an in-memory H2 database. Every column type must have a `DataType` associated with it. You don't see it referenced above because all standard Scala types have predefined implicit conversions available FOOTNOTE. If you need to use a type that is not supported by ScalaRelational, please refer to LINK.
 
@@ -62,7 +58,12 @@ session {
   create(suppliers, coffees)
 }
 ```
-     
+
+### Result
+```scala
+3
+```
+         
 
 All database queries must take place within a *session*. Sessions will be explained in LINK.
 
@@ -72,14 +73,14 @@ You'll notice we imported `ExampleDatastore._` in an effort to minimise the amou
 ```scala
 
 ```
-     
+         
 
 For the sake of readability importing the datastore is generally suggested. Although if namespace collisions are a problem you can import and alias or create a shorter reference like this:
 
 ```scala
 
 ```
-     
+         
 
 #Inserting
 ScalaRelational supports type-safe insertions:
@@ -93,7 +94,7 @@ session {
   superiorCoffeeId = insert(id(49), name("Superior Coffee"), street("1 Party Place"), city("Mendocino"), state("CA"), zip("95460")).result
 }
 ```
-     
+         
 
 If we don't call `result`, we will just create the query without ever executing it. Please note that `result` must be called within the session.
 
@@ -106,7 +107,7 @@ session {
   theHighGroundId = insertInto(suppliers, 150, "The High Ground", "100 Coffee Lane", "Meadows", "CA", "93966").result
 }
 ```
-     
+         
 
 The database returns -1 as the ID is already known.
 
@@ -124,7 +125,12 @@ session {
     and(name("French Roast Decaf"), supID(superiorCoffeeId), price(9.99), sales(0), total(0)).result
 }
 ```
-     
+
+### Result
+```scala
+List(5)
+```
+         
 
 This is very similar to the previous insert method, except instead of calling `result` we're calling `and`. This converts the insert into a batch insert and you gain the performance of being able to insert several records with one insert statement.
 
@@ -141,7 +147,12 @@ session {
   insertBatch(rows).result
 }
 ```
-     
+
+### Result
+```scala
+List(16)
+```
+         
     
 #Querying
 The DSL for querying a table is similar to SQL:
@@ -158,7 +169,27 @@ session {
   }.mkString("\n")
 }
 ```
-     
+
+### Result
+```scala
+Colombian	1	7.99	0	0
+French Roast	49	8.99	0	0
+Espresso	93966	9.99	0	0
+Colombian Decaf	1	8.99	0	0
+French Roast Decaf	49	9.99	0	0
+Generic Coffee 1	49	6.99	0	0
+Generic Coffee 2	49	6.99	0	0
+Generic Coffee 3	49	6.99	0	0
+Generic Coffee 4	49	6.99	0	0
+Generic Coffee 5	49	6.99	0	0
+Generic Coffee 6	49	6.99	0	0
+Generic Coffee 7	49	6.99	0	0
+Generic Coffee 8	49	6.99	0	0
+Generic Coffee 9	49	6.99	0	0
+Generic Coffee 10	49	6.99	0	0
+Generic Coffee 11	49	6.99	0	0
+```
+         
 
 Although that could look a little prettier by explicitly querying what we want to see:
 
@@ -173,7 +204,27 @@ session {
   }.mkString("\n")
 }
 ```
-     
+
+### Result
+```scala
+Colombian  1  7.99  0  0
+French Roast  49  8.99  0  0
+Espresso  93966  9.99  0  0
+Colombian Decaf  1  8.99  0  0
+French Roast Decaf  49  9.99  0  0
+Generic Coffee 1  49  6.99  0  0
+Generic Coffee 2  49  6.99  0  0
+Generic Coffee 3  49  6.99  0  0
+Generic Coffee 4  49  6.99  0  0
+Generic Coffee 5  49  6.99  0  0
+Generic Coffee 6  49  6.99  0  0
+Generic Coffee 7  49  6.99  0  0
+Generic Coffee 8  49  6.99  0  0
+Generic Coffee 9  49  6.99  0  0
+Generic Coffee 10  49  6.99  0  0
+Generic Coffee 11  49  6.99  0  0
+```
+         
 
 Joins are supported too. In the following example we query all coffees back filtering and joining with suppliers:
 
@@ -191,7 +242,25 @@ session {
   }.mkString("\n")
 }
 ```
-     
+
+### Result
+```scala
+Coffee: Colombian, Supplier: Acme, Inc.
+Coffee: French Roast, Supplier: Superior Coffee
+Coffee: Colombian Decaf, Supplier: Acme, Inc.
+Coffee: Generic Coffee 1, Supplier: Superior Coffee
+Coffee: Generic Coffee 2, Supplier: Superior Coffee
+Coffee: Generic Coffee 3, Supplier: Superior Coffee
+Coffee: Generic Coffee 4, Supplier: Superior Coffee
+Coffee: Generic Coffee 5, Supplier: Superior Coffee
+Coffee: Generic Coffee 6, Supplier: Superior Coffee
+Coffee: Generic Coffee 7, Supplier: Superior Coffee
+Coffee: Generic Coffee 8, Supplier: Superior Coffee
+Coffee: Generic Coffee 9, Supplier: Superior Coffee
+Coffee: Generic Coffee 10, Supplier: Superior Coffee
+Coffee: Generic Coffee 11, Supplier: Superior Coffee
+```
+         
 
 #Remarks
 You may have noticed the striking similarity between this code and Slick's introductory tutorial. This was done purposefully to allow better comparison of functionality between the two frameworks.
